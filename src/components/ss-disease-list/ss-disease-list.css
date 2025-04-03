@@ -1,0 +1,7 @@
+:host {
+  display: block;
+}
+
+.md-list-item:hover {
+  background-color: gray;
+}
