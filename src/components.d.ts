@@ -6,32 +6,94 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    interface SsDiseaseCaseEditor {
+        "entryId": string;
+    }
     interface SsDiseaseList {
     }
+    interface SsDiseaseMonitorApp {
+        "basePath": string;
+    }
+}
+export interface SsDiseaseCaseEditorCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLSsDiseaseCaseEditorElement;
+}
+export interface SsDiseaseListCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLSsDiseaseListElement;
 }
 declare global {
+    interface HTMLSsDiseaseCaseEditorElementEventMap {
+        "editor-closed": string;
+    }
+    interface HTMLSsDiseaseCaseEditorElement extends Components.SsDiseaseCaseEditor, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLSsDiseaseCaseEditorElementEventMap>(type: K, listener: (this: HTMLSsDiseaseCaseEditorElement, ev: SsDiseaseCaseEditorCustomEvent<HTMLSsDiseaseCaseEditorElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLSsDiseaseCaseEditorElementEventMap>(type: K, listener: (this: HTMLSsDiseaseCaseEditorElement, ev: SsDiseaseCaseEditorCustomEvent<HTMLSsDiseaseCaseEditorElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLSsDiseaseCaseEditorElement: {
+        prototype: HTMLSsDiseaseCaseEditorElement;
+        new (): HTMLSsDiseaseCaseEditorElement;
+    };
+    interface HTMLSsDiseaseListElementEventMap {
+        "entry-clicked": string;
+    }
     interface HTMLSsDiseaseListElement extends Components.SsDiseaseList, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLSsDiseaseListElementEventMap>(type: K, listener: (this: HTMLSsDiseaseListElement, ev: SsDiseaseListCustomEvent<HTMLSsDiseaseListElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLSsDiseaseListElementEventMap>(type: K, listener: (this: HTMLSsDiseaseListElement, ev: SsDiseaseListCustomEvent<HTMLSsDiseaseListElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLSsDiseaseListElement: {
         prototype: HTMLSsDiseaseListElement;
         new (): HTMLSsDiseaseListElement;
     };
+    interface HTMLSsDiseaseMonitorAppElement extends Components.SsDiseaseMonitorApp, HTMLStencilElement {
+    }
+    var HTMLSsDiseaseMonitorAppElement: {
+        prototype: HTMLSsDiseaseMonitorAppElement;
+        new (): HTMLSsDiseaseMonitorAppElement;
+    };
     interface HTMLElementTagNameMap {
+        "ss-disease-case-editor": HTMLSsDiseaseCaseEditorElement;
         "ss-disease-list": HTMLSsDiseaseListElement;
+        "ss-disease-monitor-app": HTMLSsDiseaseMonitorAppElement;
     }
 }
 declare namespace LocalJSX {
+    interface SsDiseaseCaseEditor {
+        "entryId"?: string;
+        "onEditor-closed"?: (event: SsDiseaseCaseEditorCustomEvent<string>) => void;
+    }
     interface SsDiseaseList {
+        "onEntry-clicked"?: (event: SsDiseaseListCustomEvent<string>) => void;
+    }
+    interface SsDiseaseMonitorApp {
+        "basePath"?: string;
     }
     interface IntrinsicElements {
+        "ss-disease-case-editor": SsDiseaseCaseEditor;
         "ss-disease-list": SsDiseaseList;
+        "ss-disease-monitor-app": SsDiseaseMonitorApp;
     }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "ss-disease-case-editor": LocalJSX.SsDiseaseCaseEditor & JSXBase.HTMLAttributes<HTMLSsDiseaseCaseEditorElement>;
             "ss-disease-list": LocalJSX.SsDiseaseList & JSXBase.HTMLAttributes<HTMLSsDiseaseListElement>;
+            "ss-disease-monitor-app": LocalJSX.SsDiseaseMonitorApp & JSXBase.HTMLAttributes<HTMLSsDiseaseMonitorAppElement>;
         }
     }
 }

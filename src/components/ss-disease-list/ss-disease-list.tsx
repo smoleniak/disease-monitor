@@ -1,4 +1,4 @@
-import { Component, Host, h } from '@stencil/core';
+import { Component, Event, EventEmitter, Host, h } from '@stencil/core';
 
 @Component({
   tag: 'ss-disease-list',
@@ -7,6 +7,7 @@ import { Component, Host, h } from '@stencil/core';
 })
 export class SsDiseaseList {
   diseaseCases: any[];
+  @Event({ eventName: "entry-clicked"}) entryClicked: EventEmitter<string>;
 
   private async getDiseaseCasesAsync(){
     return await Promise.resolve(
@@ -40,8 +41,8 @@ export class SsDiseaseList {
     return (
       <Host>
         <md-list>
-          {this.diseaseCases.map(diseaseCase =>
-            <md-list-item>
+          {this.diseaseCases.map((diseaseCase, index) =>
+            <md-list-item onClick={ () => this.entryClicked.emit(index.toString()) }>
               <div slot="headline">{diseaseCase.disease} {diseaseCase.zipCode}</div>
               <div slot="supporting-text">Location: {diseaseCase.coords[0]}°N {diseaseCase.coords[1]}°E</div>
               <div slot="supporting-text">Reported on: {diseaseCase.diseaseStart?.toISOString().split('T')[0]}</div>
