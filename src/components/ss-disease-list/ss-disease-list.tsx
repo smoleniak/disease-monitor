@@ -19,7 +19,7 @@ export class SsDiseaseList {
           patientId: '10001',
       }, {
           disease: 'SLAK',
-          coords: [48.156, 17.097],
+          coords: [48.156, 17.098],
           diseaseStart: new Date(Date.now() - 3600 * 72 * 1000),
           patientName: 'Bc. August Cézar',
           patientId: '10096',
