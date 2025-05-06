@@ -56,9 +56,13 @@ export class SsDiseaseMonitorApp {
         ? <ss-disease-case-editor entry-id={entryId}
             oneditor-closed={ () => navigate("./list")} >
           </ss-disease-case-editor>
-        : <ss-disease-list
-            onentry-clicked={ (ev: CustomEvent<string>)=> navigate("./entry/" + ev.detail) } >
-          </ss-disease-list>
+        : 
+          <div>
+            <ss-disease-map></ss-disease-map>
+            <ss-disease-list
+              onentry-clicked={ (ev: CustomEvent<string>)=> navigate("./entry/" + ev.detail) } >
+            </ss-disease-list>
+          </div>
         }
   
       </Host>

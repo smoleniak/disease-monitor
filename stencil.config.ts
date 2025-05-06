@@ -19,6 +19,12 @@ export const config: Config = {
     {
       type: 'www',
       serviceWorker: null, // disable service workers
+      copy: [
+        {
+          src: '../node_modules/leaflet/dist/images',
+          dest: 'leaflet/images',
+        },
+      ],
     },
   ],
   testing: {

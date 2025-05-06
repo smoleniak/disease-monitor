@@ -6,7 +6,9 @@ import { Component, Event, EventEmitter, Host, h } from '@stencil/core';
   shadow: true,
 })
 export class SsDiseaseList {
+
   diseaseCases: any[];
+  
   @Event({ eventName: "entry-clicked"}) entryClicked: EventEmitter<string>;
 
   private async getDiseaseCasesAsync(){

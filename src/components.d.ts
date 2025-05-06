@@ -11,6 +11,8 @@ export namespace Components {
     }
     interface SsDiseaseList {
     }
+    interface SsDiseaseMap {
+    }
     interface SsDiseaseMonitorApp {
         "basePath": string;
     }
@@ -58,6 +60,12 @@ declare global {
         prototype: HTMLSsDiseaseListElement;
         new (): HTMLSsDiseaseListElement;
     };
+    interface HTMLSsDiseaseMapElement extends Components.SsDiseaseMap, HTMLStencilElement {
+    }
+    var HTMLSsDiseaseMapElement: {
+        prototype: HTMLSsDiseaseMapElement;
+        new (): HTMLSsDiseaseMapElement;
+    };
     interface HTMLSsDiseaseMonitorAppElement extends Components.SsDiseaseMonitorApp, HTMLStencilElement {
     }
     var HTMLSsDiseaseMonitorAppElement: {
@@ -67,6 +75,7 @@ declare global {
     interface HTMLElementTagNameMap {
         "ss-disease-case-editor": HTMLSsDiseaseCaseEditorElement;
         "ss-disease-list": HTMLSsDiseaseListElement;
+        "ss-disease-map": HTMLSsDiseaseMapElement;
         "ss-disease-monitor-app": HTMLSsDiseaseMonitorAppElement;
     }
 }
@@ -78,12 +87,15 @@ declare namespace LocalJSX {
     interface SsDiseaseList {
         "onEntry-clicked"?: (event: SsDiseaseListCustomEvent<string>) => void;
     }
+    interface SsDiseaseMap {
+    }
     interface SsDiseaseMonitorApp {
         "basePath"?: string;
     }
     interface IntrinsicElements {
         "ss-disease-case-editor": SsDiseaseCaseEditor;
         "ss-disease-list": SsDiseaseList;
+        "ss-disease-map": SsDiseaseMap;
         "ss-disease-monitor-app": SsDiseaseMonitorApp;
     }
 }
@@ -93,6 +105,7 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "ss-disease-case-editor": LocalJSX.SsDiseaseCaseEditor & JSXBase.HTMLAttributes<HTMLSsDiseaseCaseEditorElement>;
             "ss-disease-list": LocalJSX.SsDiseaseList & JSXBase.HTMLAttributes<HTMLSsDiseaseListElement>;
+            "ss-disease-map": LocalJSX.SsDiseaseMap & JSXBase.HTMLAttributes<HTMLSsDiseaseMapElement>;
             "ss-disease-monitor-app": LocalJSX.SsDiseaseMonitorApp & JSXBase.HTMLAttributes<HTMLSsDiseaseMonitorAppElement>;
         }
     }
