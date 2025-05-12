@@ -12,6 +12,7 @@ export namespace Components {
     interface SsDiseaseList {
     }
     interface SsDiseaseMap {
+        "basePath": string;
     }
     interface SsDiseaseMonitorApp {
         "basePath": string;
@@ -24,6 +25,10 @@ export interface SsDiseaseCaseEditorCustomEvent<T> extends CustomEvent<T> {
 export interface SsDiseaseListCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLSsDiseaseListElement;
+}
+export interface SsDiseaseMapCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLSsDiseaseMapElement;
 }
 declare global {
     interface HTMLSsDiseaseCaseEditorElementEventMap {
@@ -60,7 +65,18 @@ declare global {
         prototype: HTMLSsDiseaseListElement;
         new (): HTMLSsDiseaseListElement;
     };
+    interface HTMLSsDiseaseMapElementEventMap {
+        "map-clicked": string;
+    }
     interface HTMLSsDiseaseMapElement extends Components.SsDiseaseMap, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLSsDiseaseMapElementEventMap>(type: K, listener: (this: HTMLSsDiseaseMapElement, ev: SsDiseaseMapCustomEvent<HTMLSsDiseaseMapElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLSsDiseaseMapElementEventMap>(type: K, listener: (this: HTMLSsDiseaseMapElement, ev: SsDiseaseMapCustomEvent<HTMLSsDiseaseMapElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLSsDiseaseMapElement: {
         prototype: HTMLSsDiseaseMapElement;
@@ -88,6 +104,8 @@ declare namespace LocalJSX {
         "onEntry-clicked"?: (event: SsDiseaseListCustomEvent<string>) => void;
     }
     interface SsDiseaseMap {
+        "basePath"?: string;
+        "onMap-clicked"?: (event: SsDiseaseMapCustomEvent<string>) => void;
     }
     interface SsDiseaseMonitorApp {
         "basePath"?: string;

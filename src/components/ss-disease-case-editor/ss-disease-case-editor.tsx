@@ -10,6 +10,22 @@ export class SsDiseaseCaseEditor {
 
   @Event({eventName: "editor-closed"}) editorClosed: EventEmitter<string>;
 
+  private lat: string | null = null;
+  private lng: string | null = null;
+
+  componentWillLoad() {
+    const url = new URL(window.location.href);
+    const coordsParam = url.searchParams.get('coords');
+    // console.log('Coords param:' + coordsParam);
+
+    if (coordsParam) {
+      const [latStr, lngStr] = coordsParam.split(',');
+      this.lat = latStr;
+      this.lng = lngStr;
+      // console.log(this.lat);
+    }
+  }
+
   render() {
     return (
       <Host>
@@ -26,9 +42,14 @@ export class SsDiseaseCaseEditor {
           </md-select-option>
         </md-filled-select>
 
-        <md-filled-text-field label="Lokalita">
-          <md-icon slot="leading-icon">pin_drop</md-icon>
-        </md-filled-text-field>
+        <div id="location-wrapper">
+          <md-filled-text-field class="location-field" label="Latitude" required value={this.lat ?? ''}>
+            <md-icon slot="leading-icon">pin_drop</md-icon>
+          </md-filled-text-field>
+          <md-filled-text-field class="location-field" label="Longtitude" required value={this.lng ?? ''}>
+            <md-icon slot="leading-icon">pin_drop</md-icon>
+          </md-filled-text-field>
+        </div>
   
         <md-filled-text-field label="Meno a Priezvisko" >
           <md-icon slot="leading-icon">person</md-icon>

@@ -14,18 +14,21 @@ export class SsDiseaseList {
   private async getDiseaseCasesAsync(){
     return await Promise.resolve(
       [{
+          diseaseCaseId: 'x123',
           disease: 'SARS-CoV-2',
           coords: [48.1486, 17.1077],
           diseaseStart: new Date(Date.now() - 3600 * 48 * 1000),
           patientName: 'Jožko Púčik',
           patientId: '10001',
       }, {
+          diseaseCaseId: 'x123',
           disease: 'SLAK',
           coords: [48.156, 17.098],
           diseaseStart: new Date(Date.now() - 3600 * 72 * 1000),
           patientName: 'Bc. August Cézar',
           patientId: '10096',
       }, {
+          diseaseCaseId: 'x123',
           disease: 'SARS-CoV-2',
           coords: [48.1485, 17.1071],
           diseaseStart: new Date(Date.now() - 3600 * 1 * 1000),
@@ -44,7 +47,7 @@ export class SsDiseaseList {
       <Host>
         <md-list>
           {this.diseaseCases.map((diseaseCase, index) =>
-            <md-list-item onClick={ () => this.entryClicked.emit(index.toString()) }>
+            <md-list-item onClick={ () => this.entryClicked.emit(diseaseCase.diseaseCaseId) }>
               <div slot="headline">{diseaseCase.disease} {diseaseCase.zipCode}</div>
               <div slot="supporting-text">Location: {diseaseCase.coords[0]}°N {diseaseCase.coords[1]}°E</div>
               <div slot="supporting-text">Reported on: {diseaseCase.diseaseStart?.toISOString().split('T')[0]}</div>

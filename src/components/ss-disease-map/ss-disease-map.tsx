@@ -1,4 +1,4 @@
-import { Component, Element, Host, h } from '@stencil/core';
+import { Component, Element, Host, Event, EventEmitter, Prop, h } from '@stencil/core';
 import L from 'leaflet';
 
 @Component({
@@ -14,21 +14,28 @@ export class SsDiseaseMap {
 
   private diseaseCases: any[];
 
+  @Prop() basePath: string="";
+
+  @Event({ eventName: "map-clicked"}) mapClicked: EventEmitter<string>;
+
   private async getDiseaseCasesAsync(){
     return await Promise.resolve(
       [{
+          diseaseCaseId: 'x234',
           disease: 'SARS-CoV-2',
           coords: [48.1486, 17.1077],
           diseaseStart: new Date(Date.now() - 3600 * 48 * 1000),
           patientName: 'Jožko Púčik',
           patientId: '10001',
       }, {
+          diseaseCaseId: 'x235',  
           disease: 'SLAK',
           coords: [48.156, 17.098],
           diseaseStart: new Date(Date.now() - 3600 * 72 * 1000),
           patientName: 'Bc. August Cézar',
           patientId: '10096',
       }, {
+          diseaseCaseId: 'x236',  
           disease: 'SARS-CoV-2',
           coords: [48.1485, 17.1071],
           diseaseStart: new Date(Date.now() - 3600 * 1 * 1000),
@@ -37,7 +44,7 @@ export class SsDiseaseMap {
       }]
     );
   }
-
+  
   async componentWillLoad() {
     this.diseaseCases = await this.getDiseaseCasesAsync();
   }
@@ -45,16 +52,24 @@ export class SsDiseaseMap {
   async componentDidLoad() {
     // set up Leaflet interactive Map after component loads
     const mapContainer = this.el.shadowRoot.querySelector("#disease-map") as HTMLElement;
-    this.map = L.map(mapContainer).setView([48.1486, 17.1077], 10);  // set initial coords to Bratislava
+    this.map = L.map(mapContainer).setView([48.1486, 17.1077], 13);  // set initial coords to Bratislava
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(this.map);
 
-    L.Icon.Default.imagePath = '/leaflet/images/';
+    L.Icon.Default.imagePath = this.basePath + 'leaflet/images/';
     
     // Add markers after map is ready
-    this.diseaseCases.forEach(({ coords, disease, diseaseStart }) => {
-      L.marker(coords).addTo(this.map).bindPopup(`<b>${disease}<b><br>Reported on: ${diseaseStart.toISOString().split('T')[0]}`);
+    this.diseaseCases.forEach(({ coords, disease, diseaseStart, diseaseCaseId }) => {
+      L.marker(coords).addTo(this.map).bindPopup(
+        `<b>${disease}<b>
+        <br>Reported on: ${diseaseStart.toISOString().split('T')[0]}
+        <br><a href="entry/${diseaseCaseId}">Edit</a>`);
+      });
+    
+    this.map.on('click', (e: L.LeafletMouseEvent) => {
+      const coords = `${e.latlng.lat},${e.latlng.lng}`;
+      this.mapClicked.emit(coords);
     });
   }
 

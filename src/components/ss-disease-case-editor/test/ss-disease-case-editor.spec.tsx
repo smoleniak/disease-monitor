@@ -11,7 +11,6 @@ describe('ss-disease-case-editor', () => {
     expect(items.length).toEqual(1);
     items = await page.root.shadowRoot.querySelectorAll("md-outlined-button");
     expect(items.length).toEqual(1);
-
     items = await page.root.shadowRoot.querySelectorAll("md-filled-tonal-button");
     expect(items.length).toEqual(1);
   });

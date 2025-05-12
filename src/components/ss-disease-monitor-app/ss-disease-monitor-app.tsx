@@ -36,36 +36,39 @@ export class SsDiseaseMonitorApp {
   }
 
   render() {
-    let element = "list"
-    let entryId = "@new"
+    let element = "map"; // default view
+    let entryId = "@new";
   
-    if ( this.relativePath.startsWith("entry/"))
-    {
+    if (this.relativePath.startsWith("entry/")) {
       element = "editor";
-      entryId = this.relativePath.split("/")[1]
+      entryId = this.relativePath.split("/")[1];
+    } else if (this.relativePath === "list") {
+      element = "list";
+    } else if (this.relativePath === "map") {
+      element = "map";
     }
   
-    const navigate = (path:string) => {
+    const navigate = (path: string) => {
       const absolute = new URL(path, new URL(this.basePath, document.baseURI)).pathname;
-      window.navigation.navigate(absolute)
-    }
+      window.navigation.navigate(absolute);
+    };
   
     return (
       <Host>
-        { element === "editor"
-        ? <ss-disease-case-editor entry-id={entryId}
-            oneditor-closed={ () => navigate("./list")} >
-          </ss-disease-case-editor>
-        : 
-          <div>
-            <ss-disease-map></ss-disease-map>
-            <ss-disease-list
-              onentry-clicked={ (ev: CustomEvent<string>)=> navigate("./entry/" + ev.detail) } >
-            </ss-disease-list>
-          </div>
-        }
-  
+        {element === "editor" ? (
+          <ss-disease-case-editor entry-id={entryId} oneditor-closed={() => navigate("./map")}></ss-disease-case-editor>
+        ) : element === "list" ? (
+          <ss-disease-list
+            onentry-clicked={(ev: CustomEvent<string>) => navigate("./entry/" + ev.detail)}
+          ></ss-disease-list>
+        ) : (
+          <ss-disease-map 
+            base-path={this.basePath}
+            onMap-clicked={(ev: CustomEvent<string>) => navigate("./entry/@new&coords=" + ev.detail)}
+          ></ss-disease-map>
+        )}
       </Host>
     );
   }
+  
 }

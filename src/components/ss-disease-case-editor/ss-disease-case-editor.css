@@ -12,7 +12,6 @@
   flex-direction: row;
   justify-content: flex-end;
   gap: 1rem;
-
 }
 
 .stretch-fill {
@@ -21,4 +20,14 @@
 
 md-divider {
   margin-bottom: var(--_wl-editor_gap);
+}
+
+#location-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.location-field {
+  width: 100%;
 }
