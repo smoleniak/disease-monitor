@@ -16,7 +16,8 @@ export class SsDiseaseMap {
 
   @Prop() basePath: string="";
 
-  @Event({ eventName: "map-clicked"}) mapClicked: EventEmitter<string>;
+  @Event({ eventName: 'map-clicked'}) mapClicked: EventEmitter<string>;
+  @Event({ eventName: 'entry-clicked' }) entryClicked: EventEmitter<string>;
 
   private async getDiseaseCasesAsync(){
     return await Promise.resolve(
@@ -62,11 +63,21 @@ export class SsDiseaseMap {
     
     // Add markers for disease cases after map is ready
     this.diseaseCases.forEach(({ coords, disease, diseaseStart, diseaseCaseId }) => {
-      L.marker(coords).addTo(this.map).bindPopup(
-        `<b>${disease}<b>
+      const marker = L.marker(coords).addTo(this.map);
+      const popupDiv = document.createElement('div');
+
+      popupDiv.innerHTML = `
+        <b>${disease}<b>
         <br>Reported on: ${diseaseStart.toISOString().split('T')[0]}
-        <br><a href="entry/${diseaseCaseId}">Edit</a>`);
+        <br><a href="#">Edit</a>
+      `
+      popupDiv.querySelector('a')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.entryClicked.emit(diseaseCaseId);
       });
+
+      marker.bindPopup(popupDiv);
+    });
     
     this.map.on('click', (e: L.LeafletMouseEvent) => {
       const coords = `${e.latlng.lat},${e.latlng.lng}`;

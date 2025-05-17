@@ -67,6 +67,7 @@ declare global {
     };
     interface HTMLSsDiseaseMapElementEventMap {
         "map-clicked": string;
+        "entry-clicked": string;
     }
     interface HTMLSsDiseaseMapElement extends Components.SsDiseaseMap, HTMLStencilElement {
         addEventListener<K extends keyof HTMLSsDiseaseMapElementEventMap>(type: K, listener: (this: HTMLSsDiseaseMapElement, ev: SsDiseaseMapCustomEvent<HTMLSsDiseaseMapElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -105,6 +106,7 @@ declare namespace LocalJSX {
     }
     interface SsDiseaseMap {
         "basePath"?: string;
+        "onEntry-clicked"?: (event: SsDiseaseMapCustomEvent<string>) => void;
         "onMap-clicked"?: (event: SsDiseaseMapCustomEvent<string>) => void;
     }
     interface SsDiseaseMonitorApp {

@@ -65,6 +65,7 @@ export class SsDiseaseMonitorApp {
           <ss-disease-map 
             base-path={this.basePath}
             onMap-clicked={(ev: CustomEvent<string>) => navigate("./entry/@new?coords=" + ev.detail)}
+            onentry-clicked={(ev: CustomEvent<string>) => navigate("./entry/" + ev.detail)}
           ></ss-disease-map>
         )}
       </Host>
