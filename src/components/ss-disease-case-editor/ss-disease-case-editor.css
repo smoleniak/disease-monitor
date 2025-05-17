@@ -22,12 +22,12 @@ md-divider {
   margin-bottom: var(--_wl-editor_gap);
 }
 
-#location-wrapper {
+.column-wrapper {
   display: flex;
   flex-direction: row;
   gap: 1rem;
 }
 
-.location-field {
+.column-field {
   width: 100%;
 }

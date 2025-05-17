@@ -23,7 +23,7 @@ export class SsDiseaseMap {
       [{
           diseaseCaseId: 'x234',
           disease: 'SARS-CoV-2',
-          coords: [48.1486, 17.1077],
+          coords: [48.1486, 17.1079],
           diseaseStart: new Date(Date.now() - 3600 * 48 * 1000),
           patientName: 'Jožko Púčik',
           patientId: '10001',
@@ -57,9 +57,10 @@ export class SsDiseaseMap {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(this.map);
 
+    // link to image folder - contains default marker images
     L.Icon.Default.imagePath = this.basePath + 'leaflet/images/';
     
-    // Add markers after map is ready
+    // Add markers for disease cases after map is ready
     this.diseaseCases.forEach(({ coords, disease, diseaseStart, diseaseCaseId }) => {
       L.marker(coords).addTo(this.map).bindPopup(
         `<b>${disease}<b>
@@ -69,6 +70,7 @@ export class SsDiseaseMap {
     
     this.map.on('click', (e: L.LeafletMouseEvent) => {
       const coords = `${e.latlng.lat},${e.latlng.lng}`;
+      console.log('Emitting coords: ' + coords);
       this.mapClicked.emit(coords);
     });
   }

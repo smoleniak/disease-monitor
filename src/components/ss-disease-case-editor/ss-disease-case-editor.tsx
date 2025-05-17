@@ -14,22 +14,26 @@ export class SsDiseaseCaseEditor {
   private lng: string | null = null;
 
   componentWillLoad() {
+    // parse coords param if present
     const url = new URL(window.location.href);
     const coordsParam = url.searchParams.get('coords');
-    // console.log('Coords param:' + coordsParam);
 
     if (coordsParam) {
       const [latStr, lngStr] = coordsParam.split(',');
       this.lat = latStr;
       this.lng = lngStr;
-      // console.log(this.lat);
     }
   }
 
   render() {
     return (
       <Host>
-        <md-filled-select label="Choroba">
+        <md-filled-text-field label="ID prípadu" 
+          required value={this.entryId}>
+          <md-icon slot="leading-icon">fingerprint</md-icon>
+        </md-filled-text-field>
+
+        <md-filled-select label="Choroba" required>
           <md-icon slot="leading-icon">sick</md-icon>
           <md-select-option value="covid">
             <div slot="headline">SARS-CoV-2</div>
@@ -42,26 +46,28 @@ export class SsDiseaseCaseEditor {
           </md-select-option>
         </md-filled-select>
 
-        <div id="location-wrapper">
-          <md-filled-text-field class="location-field" label="Latitude" required value={this.lat ?? ''}>
+        <md-filled-text-field label="Meno a priezvisko nakazeného" >
+          <md-icon slot="leading-icon">person</md-icon>
+        </md-filled-text-field>
+        
+        <div class="column-wrapper">
+          <md-filled-text-field class="column-field" label="Latitude" required value={this.lat ?? ''}>
             <md-icon slot="leading-icon">pin_drop</md-icon>
           </md-filled-text-field>
-          <md-filled-text-field class="location-field" label="Longtitude" required value={this.lng ?? ''}>
+          <md-filled-text-field class="column-field" label="Longtitude" required value={this.lng ?? ''}>
             <md-icon slot="leading-icon">pin_drop</md-icon>
           </md-filled-text-field>
         </div>
   
-        <md-filled-text-field label="Meno a Priezvisko" >
-          <md-icon slot="leading-icon">person</md-icon>
-        </md-filled-text-field>
-  
-        <md-filled-text-field label="Registračné číslo pacienta" >
-          <md-icon slot="leading-icon">fingerprint</md-icon>
-        </md-filled-text-field>
-        
-        <md-filled-text-field label="Nakazený od">
-          <md-icon slot="leading-icon">watch_later</md-icon>
-        </md-filled-text-field>
+        <div class="column-wrapper">
+          <md-filled-text-field class="column-field" label="Nakazený od" required>
+            <md-icon slot="leading-icon">watch_later</md-icon>
+          </md-filled-text-field>
+
+          <md-filled-text-field class="column-field" label="Choroba prekonaná">
+            <md-icon slot="leading-icon">watch_later</md-icon>
+          </md-filled-text-field>
+        </div>
 
         <md-divider></md-divider>
         <div class="actions">

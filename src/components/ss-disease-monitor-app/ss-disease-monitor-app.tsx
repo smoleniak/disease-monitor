@@ -49,7 +49,7 @@ export class SsDiseaseMonitorApp {
     }
   
     const navigate = (path: string) => {
-      const absolute = new URL(path, new URL(this.basePath, document.baseURI)).pathname;
+      const absolute = new URL(path, new URL(this.basePath, document.baseURI)).href;
       window.navigation.navigate(absolute);
     };
   
@@ -64,7 +64,7 @@ export class SsDiseaseMonitorApp {
         ) : (
           <ss-disease-map 
             base-path={this.basePath}
-            onMap-clicked={(ev: CustomEvent<string>) => navigate("./entry/@new&coords=" + ev.detail)}
+            onMap-clicked={(ev: CustomEvent<string>) => navigate("./entry/@new?coords=" + ev.detail)}
           ></ss-disease-map>
         )}
       </Host>
