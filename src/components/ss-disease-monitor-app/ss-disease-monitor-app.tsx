@@ -12,8 +12,10 @@ declare global {
 export class SsDiseaseMonitorApp {
 
   @State() private relativePath = "";
-
   @Prop() basePath: string="";
+  @Prop() imagePath: string="";
+  @Prop() apiBase: string;
+  @Prop() regionId: string;
 
   componentWillLoad() {
     const baseUri = new URL(this.basePath, document.baseURI || "/").pathname;
@@ -59,11 +61,12 @@ export class SsDiseaseMonitorApp {
           <ss-disease-case-editor entry-id={entryId} oneditor-closed={() => navigate("./map")}></ss-disease-case-editor>
         ) : element === "list" ? (
           <ss-disease-list
+            region-id={this.regionId} api-base={this.apiBase}
             onentry-clicked={(ev: CustomEvent<string>) => navigate("./entry/" + ev.detail)}
           ></ss-disease-list>
         ) : (
           <ss-disease-map 
-            base-path={this.basePath}
+            region-id={this.regionId} api-base={this.apiBase} image-path={this.imagePath}
             onMap-clicked={(ev: CustomEvent<string>) => navigate("./entry/@new?coords=" + ev.detail)}
             onentry-clicked={(ev: CustomEvent<string>) => navigate("./entry/" + ev.detail)}
           ></ss-disease-map>

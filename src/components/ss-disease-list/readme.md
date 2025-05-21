@@ -5,6 +5,15 @@
 <!-- Auto Generated Below -->
 
 
+## Properties
+
+| Property       | Attribute       | Description | Type     | Default     |
+| -------------- | --------------- | ----------- | -------- | ----------- |
+| `apiBase`      | `api-base`      |             | `string` | `undefined` |
+| `errorMessage` | `error-message` |             | `string` | `undefined` |
+| `regionId`     | `region-id`     |             | `string` | `undefined` |
+
+
 ## Events
 
 | Event           | Description | Type                  |

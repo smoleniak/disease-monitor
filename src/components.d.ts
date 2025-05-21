@@ -10,12 +10,19 @@ export namespace Components {
         "entryId": string;
     }
     interface SsDiseaseList {
+        "apiBase": string;
+        "regionId": string;
     }
     interface SsDiseaseMap {
-        "basePath": string;
+        "apiBase": string;
+        "imagePath": string;
+        "regionId": string;
     }
     interface SsDiseaseMonitorApp {
+        "apiBase": string;
         "basePath": string;
+        "imagePath": string;
+        "regionId": string;
     }
 }
 export interface SsDiseaseCaseEditorCustomEvent<T> extends CustomEvent<T> {
@@ -102,15 +109,22 @@ declare namespace LocalJSX {
         "onEditor-closed"?: (event: SsDiseaseCaseEditorCustomEvent<string>) => void;
     }
     interface SsDiseaseList {
+        "apiBase"?: string;
         "onEntry-clicked"?: (event: SsDiseaseListCustomEvent<string>) => void;
+        "regionId"?: string;
     }
     interface SsDiseaseMap {
-        "basePath"?: string;
+        "apiBase"?: string;
+        "imagePath"?: string;
         "onEntry-clicked"?: (event: SsDiseaseMapCustomEvent<string>) => void;
         "onMap-clicked"?: (event: SsDiseaseMapCustomEvent<string>) => void;
+        "regionId"?: string;
     }
     interface SsDiseaseMonitorApp {
+        "apiBase"?: string;
         "basePath"?: string;
+        "imagePath"?: string;
+        "regionId"?: string;
     }
     interface IntrinsicElements {
         "ss-disease-case-editor": SsDiseaseCaseEditor;

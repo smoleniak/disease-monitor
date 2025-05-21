@@ -1,4 +1,5 @@
-import { Component, Event, EventEmitter, Host, h } from '@stencil/core';
+import { Component, Event, EventEmitter, Host, h, Prop, State } from '@stencil/core';
+import { DiseaseCaseEntry, Configuration, DiseaseMonitorCasesApi } from '../../api/disease-monitor';
 
 @Component({
   tag: 'ss-disease-list',
@@ -6,36 +7,32 @@ import { Component, Event, EventEmitter, Host, h } from '@stencil/core';
   shadow: true,
 })
 export class SsDiseaseList {
-
-  diseaseCases: any[];
   
+  @State() errorMessage: string;
   @Event({ eventName: "entry-clicked"}) entryClicked: EventEmitter<string>;
+  @Prop() apiBase: string;
+  @Prop() regionId: string;
+  
+  diseaseCases: DiseaseCaseEntry[];
 
-  private async getDiseaseCasesAsync(){
-    return await Promise.resolve(
-      [{
-          diseaseCaseId: 'x123',
-          disease: 'SARS-CoV-2',
-          coords: [48.1486, 17.1077],
-          diseaseStart: new Date(Date.now() - 3600 * 48 * 1000),
-          patientName: 'Jožko Púčik',
-          patientId: '10001',
-      }, {
-          diseaseCaseId: 'x123',
-          disease: 'SLAK',
-          coords: [48.156, 17.098],
-          diseaseStart: new Date(Date.now() - 3600 * 72 * 1000),
-          patientName: 'Bc. August Cézar',
-          patientId: '10096',
-      }, {
-          diseaseCaseId: 'x123',
-          disease: 'SARS-CoV-2',
-          coords: [48.1485, 17.1071],
-          diseaseStart: new Date(Date.now() - 3600 * 1 * 1000),
-          patientName: 'Ing. Ferdinand Trety',
-          patientId: '10028',
-      }]
-    );
+  private async getDiseaseCasesAsync(): Promise<DiseaseCaseEntry[]>{
+    // be prepared for connectivitiy issues
+    try {
+      const configuration = new Configuration({
+        basePath: this.apiBase,
+      });
+
+      const waitingListApi = new DiseaseMonitorCasesApi(configuration);
+      const response = await waitingListApi.getDiseaseCaseEntriesRaw({regionId: this.regionId})
+      if (response.raw.status < 299) {
+        return await response.value();
+      } else {
+        this.errorMessage = `Cannot retrieve list of disease cases: ${response.raw.statusText}`
+      }
+    } catch (err: any) {
+      this.errorMessage = `Cannot retrieve list of disease cases: ${err.message || "unknown"}`
+    }
+    return [];
   }
 
   async componentWillLoad() {
@@ -45,17 +42,21 @@ export class SsDiseaseList {
   render() {
     return (
       <Host>
+        {this.errorMessage
+        ? <div class="error">{this.errorMessage}</div>
+        :
         <md-list>
-          {this.diseaseCases.map((diseaseCase, index) =>
-            <md-list-item onClick={ () => this.entryClicked.emit(diseaseCase.diseaseCaseId) }>
-              <div slot="headline">{diseaseCase.disease} {diseaseCase.zipCode}</div>
-              <div slot="supporting-text">Location: {diseaseCase.coords[0]}°N {diseaseCase.coords[1]}°E</div>
+          {this.diseaseCases.map(diseaseCase  =>
+            <md-list-item onClick={ () => this.entryClicked.emit(diseaseCase.id) }>
+              <div slot="headline">{diseaseCase.disease.value}</div>
+              <div slot="supporting-text">Location: {diseaseCase.latitude}°N {diseaseCase.longtitude}°E</div>
               <div slot="supporting-text">Reported on: {diseaseCase.diseaseStart?.toISOString().split('T')[0]}</div>
-              <div slot="supporting-text">Patient ID: {diseaseCase.patientId}</div>
+              <div slot="supporting-text">Patient ID: {diseaseCase.patient.id}</div>
                 <md-icon slot="start">pin_drop</md-icon>
             </md-list-item>
           )}
         </md-list>
+        }
       </Host>
     )
   }

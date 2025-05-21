@@ -1,5 +1,6 @@
-import { Component, Element, Host, Event, EventEmitter, Prop, h } from '@stencil/core';
-import L from 'leaflet';
+import { Component, Element, Host, Event, EventEmitter, Prop, h, State } from '@stencil/core';
+import L, { LatLng } from 'leaflet';
+import { DiseaseCaseEntry, Configuration, DiseaseMonitorCasesApi } from '../../api/disease-monitor';
 
 @Component({
   tag: 'ss-disease-map',
@@ -9,41 +10,35 @@ import L from 'leaflet';
 export class SsDiseaseMap {
   
   @Element() el: HTMLElement;
-
   private map!: L.Map;
 
-  private diseaseCases: any[];
+  diseaseCases: DiseaseCaseEntry[];
 
-  @Prop() basePath: string="";
-
+  @State() errorMessage: string;
   @Event({ eventName: 'map-clicked'}) mapClicked: EventEmitter<string>;
   @Event({ eventName: 'entry-clicked' }) entryClicked: EventEmitter<string>;
+  @Prop() imagePath: string="";
+  @Prop() apiBase: string;
+  @Prop() regionId: string;
 
-  private async getDiseaseCasesAsync(){
-    return await Promise.resolve(
-      [{
-          diseaseCaseId: 'x234',
-          disease: 'SARS-CoV-2',
-          coords: [48.1486, 17.1079],
-          diseaseStart: new Date(Date.now() - 3600 * 48 * 1000),
-          patientName: 'Jožko Púčik',
-          patientId: '10001',
-      }, {
-          diseaseCaseId: 'x235',  
-          disease: 'SLAK',
-          coords: [48.156, 17.098],
-          diseaseStart: new Date(Date.now() - 3600 * 72 * 1000),
-          patientName: 'Bc. August Cézar',
-          patientId: '10096',
-      }, {
-          diseaseCaseId: 'x236',  
-          disease: 'SARS-CoV-2',
-          coords: [48.1485, 17.1071],
-          diseaseStart: new Date(Date.now() - 3600 * 1 * 1000),
-          patientName: 'Ing. Ferdinand Trety',
-          patientId: '10028',
-      }]
-    );
+  private async getDiseaseCasesAsync(): Promise<DiseaseCaseEntry[]>{
+    // be prepared for connectivitiy issues
+    try {
+      const configuration = new Configuration({
+        basePath: this.apiBase,
+      });
+
+      const waitingListApi = new DiseaseMonitorCasesApi(configuration);
+      const response = await waitingListApi.getDiseaseCaseEntriesRaw({regionId: this.regionId})
+      if (response.raw.status < 299) {
+        return await response.value();
+      } else {
+        this.errorMessage = `Cannot retrieve list of disease cases: ${response.raw.statusText}`
+      }
+    } catch (err: any) {
+      this.errorMessage = `Cannot retrieve list of disease cases: ${err.message || "unknown"}`
+    }
+    return [];
   }
   
   async componentWillLoad() {
@@ -59,21 +54,22 @@ export class SsDiseaseMap {
     }).addTo(this.map);
 
     // link to image folder - contains default marker images
-    L.Icon.Default.imagePath = this.basePath + 'leaflet/images/';
+    L.Icon.Default.imagePath = this.imagePath + 'leaflet/images/';
     
     // Add markers for disease cases after map is ready
-    this.diseaseCases.forEach(({ coords, disease, diseaseStart, diseaseCaseId }) => {
+    this.diseaseCases.forEach(diseaseCase => {
+      const coords = new LatLng(diseaseCase.latitude, diseaseCase.longtitude);
       const marker = L.marker(coords).addTo(this.map);
       const popupDiv = document.createElement('div');
 
       popupDiv.innerHTML = `
-        <b>${disease}<b>
-        <br>Reported on: ${diseaseStart.toISOString().split('T')[0]}
+        <b>${diseaseCase.disease.value}<b>
+        <br>Reported on: ${diseaseCase.diseaseStart.toISOString().split('T')[0]}
         <br><a href="#">Edit</a>
       `
       popupDiv.querySelector('a')?.addEventListener('click', (e) => {
         e.preventDefault();
-        this.entryClicked.emit(diseaseCaseId);
+        this.entryClicked.emit(diseaseCase.id);
       });
 
       marker.bindPopup(popupDiv);
@@ -81,7 +77,6 @@ export class SsDiseaseMap {
     
     this.map.on('click', (e: L.LeafletMouseEvent) => {
       const coords = `${e.latlng.lat},${e.latlng.lng}`;
-      console.log('Emitting coords: ' + coords);
       this.mapClicked.emit(coords);
     });
   }
@@ -89,7 +84,11 @@ export class SsDiseaseMap {
   render() {
     return (
       <Host>
+        {this.errorMessage
+        ? <div class="error">{this.errorMessage}</div>
+        :
         <div id="disease-map"></div>
+        }
       </Host>
     );
   }
