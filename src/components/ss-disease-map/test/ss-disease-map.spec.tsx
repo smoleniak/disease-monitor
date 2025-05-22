@@ -12,7 +12,8 @@ describe('ss-disease-map', () => {
         name: "Michael Test"
       },
       disease: {
-        value: "SARS-CoV-19",
+        value: "SLAK",
+        code: "slintacka-krivacka"
       },
       diseaseStart: new Date("20240203T12:00"),
       latitude: 48.14,
@@ -26,6 +27,7 @@ describe('ss-disease-map', () => {
       },
       disease: {
         value: "SARS-CoV-19",
+        code: "covid"
       },
       diseaseStart: new Date("20240204T12:00"),
       latitude: 48.21,

@@ -46,7 +46,7 @@ export class SsDiseaseList {
         ? <div class="error">{this.errorMessage}</div>
         :
         <md-list>
-          {this.diseaseCases.map(diseaseCase  =>
+          {this.diseaseCases.map( (diseaseCase)  =>
             <md-list-item onClick={ () => this.entryClicked.emit(diseaseCase.id) }>
               <div slot="headline">{diseaseCase.disease.value}</div>
               <div slot="supporting-text">Location: {diseaseCase.latitude}°N {diseaseCase.longtitude}°E</div>
@@ -57,6 +57,10 @@ export class SsDiseaseList {
           )}
         </md-list>
         }
+        <md-filled-icon-button class="add-button"
+          onclick={() => this.entryClicked.emit("@new")}>
+          <md-icon>add</md-icon>
+        </md-filled-icon-button>
       </Host>
     )
   }

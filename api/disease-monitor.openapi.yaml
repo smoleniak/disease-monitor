@@ -14,6 +14,8 @@ info:
 tags:
 - name: diseaseMonitorCases
   description: Disease Monitor - Disease cases API
+- name: diseaseTypes
+  description: Disease types reported in the Disease Monitor app
 paths:
   "/disease-monitor/{regionId}/entries":
     get:
@@ -41,6 +43,177 @@ paths:
               examples:
                 response:
                   $ref: "#/components/examples/DiseaseCaseEntriesExample"
+        "404":
+          description: Region with such ID does not exist
+    post:
+      tags:
+        - diseaseMonitorCases
+      summary: Saves new entry into disease case list
+      operationId: createDiseaseCaseListEntry
+      description: Use this method to store new entry into the disease case list.
+      parameters:
+        - in: path
+          name: regionId
+          description: pass the id of the particular geographic region
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiseaseCaseEntry"
+            examples:
+              request-sample:
+                $ref: "#/components/examples/DiseaseCaseEntryExample"
+        description: Disease case entry to store
+        required: true
+      responses:
+        "200":
+          description: >-
+            Value of the disease case entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiseaseCaseEntry"
+              examples:
+                updated-response:
+                  $ref: "#/components/examples/DiseaseCaseEntryExample"
+        "400":
+          description: Missing mandatory properties of input object.
+        "404":
+          description: Region with such ID does not exists
+        "409":
+          description: Entry with the specified id already exists
+  "/disease-monitor/{regionId}/entries/{entryId}":
+    get:
+      tags:
+        - diseaseMonitorCases
+      summary: Provides details about disase case entry
+      operationId: getDiseaseCaseEntry
+      description: >-
+        By using regionId and entryId you can details of particular entry.
+      parameters:
+        - in: path
+          name: regionId
+          description: pass the id of the particular geographic region
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: entryId
+          description: pass the id of the particular entry
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: value of the disease case entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiseaseCaseEntry"
+              examples:
+                response:
+                  $ref: "#/components/examples/DiseaseCaseEntryExample"
+        "404":
+          description: Region or Entry with such ID does not exist
+    put:
+      tags:
+        - diseaseMonitorCases
+      summary: Updates specific entry
+      operationId: updateDiseaseCaseEntry
+      description: Use this method to update content of the disease case entry.
+      parameters:
+        - in: path
+          name: regionId
+          description: pass the id of the particular region
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: entryId
+          description: pass the id of the particular entry
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiseaseCaseEntry"
+            examples:
+              request:
+                $ref: "#/components/examples/DiseaseCaseEntryExample"
+        description: disease case entry to update
+        required: true
+      responses:
+        "200":
+          description: >-
+            value of the disease case entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiseaseCaseEntry"
+              examples:
+                response:
+                  $ref: "#/components/examples/DiseaseCaseEntryExample"
+        "403":
+          description: >-
+            Value of the entryID and the data id is mismatching. Details are
+            provided in the response body.
+        "404":
+          description: region or Entry with such ID does not exists
+    delete:
+      tags:
+        - diseaseMonitorCases
+      summary: Deletes specific entry
+      operationId: deleteDiseaseCaseEntry
+      description: Use this method to delete the specific entry from the disease case list.
+      parameters:
+        - in: path
+          name: regionId
+          description: pass the id of the particular region
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: entryId
+          description: pass the id of the particular entry in the disease cas
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Item deleted
+        "404":
+          description: region or Entry with such ID does not exists
+  "/disease-monitor/{regionId}/disease":
+    get:
+      tags:
+        - diseaseTypes
+      summary: Provides the list of diseases associated with region
+      operationId: getDiseases
+      description: By using regionId you get list of predefined diseases
+      parameters:
+        - in: path
+          name: regionId
+          description: pass the id of the particular geographic region
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: value of the predefined diseases
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Disease"
+              examples:
+                response:
+                  $ref: "#/components/examples/DiseaseListExample"
         "404":
           description: Region with such ID does not exist
 components:
@@ -79,8 +252,7 @@ components:
         $ref: "#/components/examples/DiseaseCaseEntryExample"
     Disease:
       description: "Describes disease"
-      required:
-        - value
+      required: [value, code]
       properties:
         value:
           type: string
@@ -126,7 +298,7 @@ components:
         diseaseEnd: "2025-04-25T15:35:00Z"
     DiseaseExample:
       summary: Disease
-      description: list of diseases
+      description: disease
       value:
         value: SARS-CoV-2
         code: covid
@@ -166,3 +338,17 @@ components:
         longtitude: 17.184580
         diseaseStart: "2025-04-19T15:35:00Z"
         diseaseEnd: "2025-04-29T15:35:00Z"
+    DiseaseListExample:
+      summary: Sample of disease types
+      description: |
+        Example list of possible diseases
+      value:
+        - value: SARS-CoV-2
+          code: covid
+          typicalDurationDays: 14
+        - value: SLAK
+          code: slintacka-krivacka
+          typicalDurationDays: 7
+        - value: Malária
+          code: malaria
+          typicalDurationDays: 30

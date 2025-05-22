@@ -41,6 +41,8 @@ export class SsDiseaseMonitorApp {
     let element = "map"; // default view
     let entryId = "@new";
   
+    console.debug("relative path: " + this.relativePath);
+
     if (this.relativePath.startsWith("entry/")) {
       element = "editor";
       entryId = this.relativePath.split("/")[1];
@@ -58,7 +60,9 @@ export class SsDiseaseMonitorApp {
     return (
       <Host>
         {element === "editor" ? (
-          <ss-disease-case-editor entry-id={entryId} oneditor-closed={() => navigate("./map")}></ss-disease-case-editor>
+          <ss-disease-case-editor entry-id={entryId} 
+            region-id={this.regionId} api-base={this.apiBase}
+            oneditor-closed={() => navigate("./map")}></ss-disease-case-editor>
         ) : element === "list" ? (
           <ss-disease-list
             region-id={this.regionId} api-base={this.apiBase}

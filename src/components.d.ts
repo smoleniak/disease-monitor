@@ -7,7 +7,9 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface SsDiseaseCaseEditor {
+        "apiBase": string;
         "entryId": string;
+        "regionId": string;
     }
     interface SsDiseaseList {
         "apiBase": string;
@@ -105,8 +107,10 @@ declare global {
 }
 declare namespace LocalJSX {
     interface SsDiseaseCaseEditor {
+        "apiBase"?: string;
         "entryId"?: string;
         "onEditor-closed"?: (event: SsDiseaseCaseEditorCustomEvent<string>) => void;
+        "regionId"?: string;
     }
     interface SsDiseaseList {
         "apiBase"?: string;

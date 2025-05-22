@@ -1,4 +1,5 @@
 apis/DiseaseMonitorCasesApi.ts
+apis/DiseaseTypesApi.ts
 apis/index.ts
 index.ts
 models/Disease.ts

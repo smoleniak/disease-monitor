@@ -30,7 +30,7 @@ export interface Disease {
      * @type {string}
      * @memberof Disease
      */
-    code?: string;
+    code: string;
     /**
      * 
      * @type {number}
@@ -45,6 +45,7 @@ export interface Disease {
 export function instanceOfDisease(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "value" in value;
+    isInstance = isInstance && "code" in value;
 
     return isInstance;
 }
@@ -60,7 +61,7 @@ export function DiseaseFromJSONTyped(json: any, ignoreDiscriminator: boolean): D
     return {
         
         'value': json['value'],
-        'code': !exists(json, 'code') ? undefined : json['code'],
+        'code': json['code'],
         'typicalDurationDays': !exists(json, 'typicalDurationDays') ? undefined : json['typicalDurationDays'],
     };
 }
