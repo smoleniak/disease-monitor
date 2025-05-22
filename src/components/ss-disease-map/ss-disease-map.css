@@ -2,10 +2,48 @@
   display: block;
 }
 
+#main {
+	background-color: lavender;
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+	padding-bottom: 0.5rem;
+}
+
+#content {
+	display: flex;
+	gap: 1rem;
+}
+
+.top-bar {
+	width: 100%;
+	height: 2rem;
+	font-size: 1.25rem;
+	font-weight: bold;
+	padding: .25rem;
+	color: white;
+	background-color: mediumpurple;
+}
+
 #disease-map {
-  width: 100%;
-  height: 720px;
+  width: 75%;
+  height: 80vh;
   display: block;
+}
+
+#filters {
+	width: 25%;
+	padding: 0.5rem;
+	gap: 0.25rem;
+}
+
+.checkbox-label {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.filter-field {
+	width: 100%;
 }
 
 /* required styles for leaflet interactive map*/

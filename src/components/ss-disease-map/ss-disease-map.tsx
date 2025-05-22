@@ -1,6 +1,6 @@
 import { Component, Element, Host, Event, EventEmitter, Prop, h, State } from '@stencil/core';
 import L, { LatLng } from 'leaflet';
-import { DiseaseCaseEntry, Configuration, DiseaseMonitorCasesApi } from '../../api/disease-monitor';
+import { DiseaseCaseEntry, Configuration, Disease, DiseaseTypesApi, DiseaseMonitorCasesApi } from '../../api/disease-monitor';
 
 @Component({
   tag: 'ss-disease-map',
@@ -13,8 +13,11 @@ export class SsDiseaseMap {
   private map!: L.Map;
 
   diseaseCases: DiseaseCaseEntry[];
-
+  diseaseTypes: Disease[];
+  @State() selectedDisease: Disease;
+  @State() activeCasesOnly: boolean;
   @State() errorMessage: string;
+
   @Event({ eventName: 'map-clicked'}) mapClicked: EventEmitter<string>;
   @Event({ eventName: 'entry-clicked' }) entryClicked: EventEmitter<string>;
   @Prop() imagePath: string="";
@@ -22,14 +25,26 @@ export class SsDiseaseMap {
   @Prop() regionId: string;
 
   private async getDiseaseCasesAsync(): Promise<DiseaseCaseEntry[]>{
+    let fetchOptions: any = {
+      regionId: this.regionId 
+    }
+    
+    // add optional query params if present
+    if (this.selectedDisease) {
+      fetchOptions.diseaseType = this.selectedDisease.code;
+    }
+
+    if (this.activeCasesOnly !== undefined) {
+      fetchOptions.activeCasesOnly = this.activeCasesOnly;
+    }
+    
     // be prepared for connectivitiy issues
     try {
       const configuration = new Configuration({
         basePath: this.apiBase,
       });
-
       const waitingListApi = new DiseaseMonitorCasesApi(configuration);
-      const response = await waitingListApi.getDiseaseCaseEntriesRaw({regionId: this.regionId})
+      const response = await waitingListApi.getDiseaseCaseEntriesRaw(fetchOptions);
       if (response.raw.status < 299) {
         return await response.value();
       } else {
@@ -40,9 +55,32 @@ export class SsDiseaseMap {
     }
     return [];
   }
+
+  private async getDiseaseTypes(): Promise<Disease[]> {
+      try {
+        const configuration = new Configuration({
+          basePath: this.apiBase,
+        });
+  
+        const conditionsApi = new DiseaseTypesApi(configuration);
+  
+        const response = await conditionsApi.getDiseasesRaw({regionId: this.regionId})
+        if (response.raw.status < 299) {
+          this.diseaseTypes = await response.value();
+        }
+      } catch (err: any) {
+        this.errorMessage = `Cannot retrieve disease types: ${err.message || "unknown"}`
+      }
+      // always have some fallback condition
+      return this.diseaseTypes || [{
+        code: "fallback",
+        value: "Neurčená choroba"
+      }];
+    }
   
   async componentWillLoad() {
     this.diseaseCases = await this.getDiseaseCasesAsync();
+    this.diseaseTypes = await this.getDiseaseTypes();
   }
 
   async componentDidLoad() {
@@ -58,22 +96,7 @@ export class SsDiseaseMap {
     
     // Add markers for disease cases after map is ready
     this.diseaseCases.forEach(diseaseCase => {
-      const coords = new LatLng(diseaseCase.latitude, diseaseCase.longtitude);
-      const marker = L.marker(coords).addTo(this.map);
-      const popupDiv = document.createElement('div');
-
-      popupDiv.innerHTML = `
-        <b>${diseaseCase.disease.value}<b>
-        <br>Reported on: ${diseaseCase.diseaseStart.toISOString().split('T')[0]}
-        <br><a href="#">Edit</a>
-      `
-
-      popupDiv.querySelector('a')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        this.entryClicked.emit(diseaseCase.id);
-      });
-
-      marker.bindPopup(popupDiv);
+      this.addDiseaseCaseMarker(diseaseCase);
     });
     
     this.map.on('click', (e: L.LeafletMouseEvent) => {
@@ -99,14 +122,97 @@ export class SsDiseaseMap {
     });
   }
 
+  private addDiseaseCaseMarker(diseaseCase: DiseaseCaseEntry) {
+    const coords = new LatLng(diseaseCase.latitude, diseaseCase.longtitude);
+    const marker = L.marker(coords).addTo(this.map);
+    const popupDiv = document.createElement('div');
+  
+    popupDiv.innerHTML = `
+      <b>${diseaseCase.disease.value}</b>
+      <br>Reported on: ${diseaseCase.diseaseStart.toISOString().split('T')[0]}
+      <br><a href="#">Edit</a>
+    `;
+  
+    popupDiv.querySelector('a')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.entryClicked.emit(diseaseCase.id);
+    });
+  
+    marker.bindPopup(popupDiv);
+  }
+
+  private repaintDiseaseCaseMarkers() {
+    this.map.eachLayer(layer => {
+      // Remove only markers, not the tile layer
+      if (layer instanceof L.Marker) {
+        this.map.removeLayer(layer);
+      }
+    });
+    
+    // Re-add filtered markers
+    this.diseaseCases.forEach(diseaseCase => {
+      this.addDiseaseCaseMarker(diseaseCase);
+    });
+  }
+
+  /**
+   * Handle disease filter input event, fetch disease cases, repaint map.
+   * @param ev 
+   */
+  private async handleDiseaseTypeChange(ev: InputEvent) {
+    const target = ev.target as HTMLInputElement;
+    this.selectedDisease = this.diseaseTypes.find(d => d.code === target.value);
+    console.debug("Selected disease: " + this.selectedDisease.value);
+    this.diseaseCases = await this.getDiseaseCasesAsync();
+    this.repaintDiseaseCaseMarkers();
+  }
+
+  /**
+   * Handle checkbox filter input event, fetch disease cases, repaint map.
+   * @param ev 
+   */
+  private async handleCheckboxInputChange(ev: InputEvent) {
+    const target = ev.target as HTMLInputElement;
+    this.activeCasesOnly = target.checked;
+    this.diseaseCases = await this.getDiseaseCasesAsync();
+    this.repaintDiseaseCaseMarkers();
+  }
+
   render() {
+    if (this.errorMessage) {
+      return (
+        <Host>
+          <div class="error">{this.errorMessage}</div>
+        </Host>  
+      )
+    }
+
     return (
       <Host>
-        {this.errorMessage
-        ? <div class="error">{this.errorMessage}</div>
-        :
-        <div id="disease-map"></div>
-        }
+        <div id="main">
+          <div class="top-bar">Disease Case Visualization for "{this.regionId}" Region</div>
+          <div id="content">
+            <div id="disease-map"></div>
+            <div id="filters">
+              <md-filled-select label="Zobraziť len konkrétnu chorobu" class="filter-field"
+                oninput={(ev: InputEvent) => this.handleDiseaseTypeChange(ev)} >
+                <md-icon slot="leading-icon">sick</md-icon>
+                {this.diseaseTypes.map(d => {
+                  return (
+                    <md-select-option value={d.code}>
+                      <div slot="headline">{d.value}</div>
+                    </md-select-option>
+                    )
+                  })}
+              </md-filled-select>
+              <label class="checkbox-label">
+                <md-checkbox touch-target="wrapper" 
+                  oninput={ (ev: InputEvent) => this.handleCheckboxInputChange(ev)}></md-checkbox>
+                Iba aktívne prípady
+              </label>
+            </div>
+          </div>
+        </div>
       </Host>
     );
   }

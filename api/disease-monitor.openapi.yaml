@@ -31,6 +31,18 @@ paths:
           required: true
           schema:
             type: string
+        - in: query
+          name: diseaseType
+          description: Optional filter for disease type
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: activeCasesOnly
+          description: Optional filter to return only active (true) cases
+          required: false
+          schema:
+            type: boolean
       responses:
         "200":
           description: value of the disease case entries

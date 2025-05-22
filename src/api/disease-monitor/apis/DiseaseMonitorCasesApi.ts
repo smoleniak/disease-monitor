@@ -34,6 +34,8 @@ export interface DeleteDiseaseCaseEntryRequest {
 
 export interface GetDiseaseCaseEntriesRequest {
     regionId: string;
+    diseaseType?: string;
+    activeCasesOnly?: boolean;
 }
 
 export interface GetDiseaseCaseEntryRequest {
@@ -92,6 +94,8 @@ export interface DiseaseMonitorCasesApiInterface {
      * You get list of existing disease cases
      * @summary Provides the disease case entries
      * @param {string} regionId pass the id of the geographic region
+     * @param {string} [diseaseType] Optional filter for disease type
+     * @param {boolean} [activeCasesOnly] Optional filter to return only active (true) cases
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DiseaseMonitorCasesApiInterface
@@ -230,6 +234,14 @@ export class DiseaseMonitorCasesApi extends runtime.BaseAPI implements DiseaseMo
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters.diseaseType !== undefined) {
+            queryParameters['diseaseType'] = requestParameters.diseaseType;
+        }
+
+        if (requestParameters.activeCasesOnly !== undefined) {
+            queryParameters['activeCasesOnly'] = requestParameters.activeCasesOnly;
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
