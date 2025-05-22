@@ -67,6 +67,7 @@ export class SsDiseaseMap {
         <br>Reported on: ${diseaseCase.diseaseStart.toISOString().split('T')[0]}
         <br><a href="#">Edit</a>
       `
+
       popupDiv.querySelector('a')?.addEventListener('click', (e) => {
         e.preventDefault();
         this.entryClicked.emit(diseaseCase.id);
@@ -76,8 +77,25 @@ export class SsDiseaseMap {
     });
     
     this.map.on('click', (e: L.LeafletMouseEvent) => {
-      const coords = `${e.latlng.lat},${e.latlng.lng}`;
-      this.mapClicked.emit(coords);
+      const lat = Math.round(e.latlng.lat * 100000) / 100000;
+      const lng = Math.round(e.latlng.lng * 100000) / 100000;
+      const coords = `${lat},${lng}`
+      const popupDiv = document.createElement('div');
+      
+      popupDiv.innerHTML = `
+        <b><a href="#">Report new disease case</a><b>
+        <br>at ${lat}°, ${lng}°`
+      
+      popupDiv.querySelector('a')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.mapClicked.emit(coords);
+      });
+
+      var popup = L.popup()
+        .setLatLng(e.latlng)
+        .setContent(popupDiv)
+        .openOn(this.map);
+
     });
   }
 
