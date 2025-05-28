@@ -113,17 +113,18 @@ export class SsDiseaseCaseEditor {
     return (
       <Host>
         <form ref={el => this.formElement = el}>
-          <md-filled-text-field label="ID prípadu" 
+          {/* <md-filled-text-field label="ID prípadu" 
             required value={this.entry?.id}
             oninput={ (ev: InputEvent) => {
               if(this.entry) {this.entry.id = this.handleInputEvent(ev)}
             } }>
             <md-icon slot="leading-icon">fingerprint</md-icon>
-          </md-filled-text-field>
+          </md-filled-text-field> */}
 
           {this.renderDiseaseTypes()}
 
-          <md-filled-text-field label="Meno a priezvisko nakazeného" value={this.entry?.patient?.name} >
+          <md-filled-text-field label="Meno a priezvisko nakazeného" 
+            value={this.entry?.patient?.name} required>
             <md-icon slot="leading-icon">person</md-icon>
           </md-filled-text-field>
           
@@ -167,7 +168,7 @@ export class SsDiseaseCaseEditor {
               onClick={() => this.editorClosed.emit("cancel")}>
               Zrušiť
             </md-outlined-button>
-            <md-filled-button id="confirm" disabled={ !this.isValid}
+            <md-filled-button id="confirm" disabled={ !this.isValid }
               onClick={() => this.updateEntry() }>
               <md-icon slot="icon">save</md-icon>
               Uložiť
@@ -233,19 +234,21 @@ export class SsDiseaseCaseEditor {
         basePath: this.apiBase,
       });
   
+      this.entry.patient.id = 'a-1';
+
       const waitingListApi = new DiseaseMonitorCasesApi(configuration);
-  
+      
       const response = this.entryId == "@new" ?
         await waitingListApi.createDiseaseCaseListEntryRaw({regionId: this.regionId, diseaseCaseEntry: this.entry}) :
         await waitingListApi.updateDiseaseCaseEntryRaw({regionId: this.regionId, entryId: this.entryId, diseaseCaseEntry: this.entry});
-
-      if (response.raw.status < 299) {
+      
+        if (response.raw.status < 299) {
         this.editorClosed.emit("store")
       } else {
-        this.errorMessage = `Cannot store entry: ${response.raw.statusText}`
+        this.errorMessage = `Cannot store entry: ${response.raw.statusText}`;
       }
     } catch (err: any) {
-      this.errorMessage = `Cannot store entry: ${err.message || "unknown"}`
+      this.errorMessage = `Cannot store entry: ${err.message || "unknown"}`;
     }
   }
 
