@@ -62,7 +62,7 @@ describe('ss-disease-case-editor', () => {
     expect(items.length).toEqual(1);
   });
 
-  it('first text field is disease case id', async () => {
+  it('first text field is patient name', async () => {
     fetchMock.mockResponses(
       [JSON.stringify(sampleEntry), { status: 200 }],
       [JSON.stringify(sampleDiseases), { status: 200 }]
@@ -78,6 +78,6 @@ describe('ss-disease-case-editor', () => {
 
     const items: any = await page.root.shadowRoot.querySelectorAll("md-filled-text-field");
     expect(items.length).toBeGreaterThanOrEqual(1);
-    expect(items[0].getAttribute("value")).toEqual(sampleEntry.id);
+    expect(items[0].getAttribute("value")).toEqual(sampleEntry.patient.name);
   });
 });
