@@ -160,11 +160,17 @@ export class SsDiseaseMap {
    * @param ev 
    */
   private async handleDiseaseTypeChange(ev: InputEvent) {
-    const target = ev.target as HTMLInputElement;
-    this.selectedDisease = this.diseaseTypes.find(d => d.code === target.value);
-    console.debug("Selected disease: " + this.selectedDisease.value);
-    this.diseaseCases = await this.getDiseaseCasesAsync();
-    this.repaintDiseaseCaseMarkers();
+      const target = ev.target as HTMLInputElement;
+      const value = target.value;
+    
+      if (value === "") {
+        this.selectedDisease = undefined;
+      } else {
+        this.selectedDisease = this.diseaseTypes.find(d => d.code === value);
+      }
+    
+      this.diseaseCases = await this.getDiseaseCasesAsync();
+      this.repaintDiseaseCaseMarkers();
   }
 
   /**
@@ -190,26 +196,54 @@ export class SsDiseaseMap {
     return (
       <Host>
         <div id="main">
-          <div class="top-bar">Disease Case Visualization for "{this.regionId}" Region</div>
+          <div class="top-bar">Vizualizácia prípadov ochorenia - región {this.regionId}</div>
           <div id="content">
+            
             <div id="disease-map"></div>
-            <div id="filters">
-              <md-filled-select label="Zobraziť len konkrétnu chorobu" class="filter-field"
-                oninput={(ev: InputEvent) => this.handleDiseaseTypeChange(ev)} >
-                <md-icon slot="leading-icon">sick</md-icon>
-                {this.diseaseTypes.map(d => {
-                  return (
-                    <md-select-option value={d.code}>
-                      <div slot="headline">{d.value}</div>
-                    </md-select-option>
-                    )
-                  })}
-              </md-filled-select>
-              <label class="checkbox-label">
-                <md-checkbox touch-target="wrapper" 
-                  oninput={ (ev: InputEvent) => this.handleCheckboxInputChange(ev)}></md-checkbox>
-                Iba aktívne prípady
-              </label>
+            
+            <div id="side-panel">
+              
+              <div id="filters">
+                <div>
+                  {/* <md-icon>filter_alt</md-icon> */}
+                  <span>Filtrovanie ochorení</span>
+                </div>
+
+                <md-filled-select label="Filtrovať ochorenia" class="filter-field"
+                  oninput={(ev: InputEvent) => this.handleDiseaseTypeChange(ev)} >
+                  <md-icon slot="leading-icon">sick</md-icon>
+                  
+                  <md-select-option value="" Selected>
+                    <div slot="headline">Všetky</div>
+                  </md-select-option>
+                  
+                  {this.diseaseTypes.map(d => {
+                    return (
+                      <md-select-option value={d.code}>
+                        <div slot="headline">{d.value}</div>
+                      </md-select-option>
+                      )
+                    })}
+                </md-filled-select>
+
+                <label class="checkbox-label">
+                  <md-checkbox touch-target="wrapper" 
+                    oninput={ (ev: InputEvent) => this.handleCheckboxInputChange(ev)}></md-checkbox>
+                  Iba aktívne prípady
+                </label>
+              </div>
+
+              <div id="tooltips">
+                <div class="tooltip">
+                  <md-icon>add</md-icon>
+                  <span>Kliknite na miesto na mape pre zadanie nového prípadu ochorenia</span>
+                </div>
+                <div class="tooltip">
+                  <md-icon>edit</md-icon>
+                  <span>Kliknite na konkrétny marker na mape pre detaily a úpravu prípadu ochorenia</span>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>

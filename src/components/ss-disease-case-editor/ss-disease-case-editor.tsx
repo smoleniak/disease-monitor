@@ -113,18 +113,13 @@ export class SsDiseaseCaseEditor {
     return (
       <Host>
         <form ref={el => this.formElement = el}>
-          {/* <md-filled-text-field label="ID prípadu" 
-            required value={this.entry?.id}
-            oninput={ (ev: InputEvent) => {
-              if(this.entry) {this.entry.id = this.handleInputEvent(ev)}
-            } }>
-            <md-icon slot="leading-icon">fingerprint</md-icon>
-          </md-filled-text-field> */}
-
           {this.renderDiseaseTypes()}
 
           <md-filled-text-field label="Meno a priezvisko nakazeného" 
-            value={this.entry?.patient?.name} required>
+            value={this.entry?.patient?.name} required
+            oninput={ (ev: InputEvent) => {
+              if (this.entry) {this.entry.patient.name = this.handleInputEvent(ev); }
+            }}>
             <md-icon slot="leading-icon">person</md-icon>
           </md-filled-text-field>
           
@@ -136,7 +131,7 @@ export class SsDiseaseCaseEditor {
               <md-icon slot="leading-icon">pin_drop</md-icon>
             </md-filled-text-field>
 
-            <md-filled-text-field class="column-field" label="Longtitude" required value={this.entry?.longtitude}
+            <md-filled-text-field class="column-field" label="Longitude" required value={this.entry?.longtitude}
               oninput={ (ev: InputEvent) => {
                 if(this.entry) {this.entry.longtitude = parseFloat(this.handleInputEvent(ev))}
               } }>
@@ -189,15 +184,14 @@ export class SsDiseaseCaseEditor {
       }
     }
     return (
-      <md-filled-select label="Choroba" required
+      <md-filled-select id="chor" label="Choroba"
         display-text={this.entry?.disease?.value}
+        value={this.entry?.disease?.code}
         oninput={(ev: InputEvent) => this.handleDisease(ev)} >
       <md-icon slot="leading-icon">sick</md-icon>
       {diseases.map(d => {
           return (
-            <md-select-option
-            value={d.code}
-            selected={d.code === this.entry?.disease?.code}>
+            <md-select-option value={d.code}>
                 <div slot="headline">{d.value}</div>
             </md-select-option>
           )
@@ -208,27 +202,34 @@ export class SsDiseaseCaseEditor {
 
   private handleInputEvent( ev: InputEvent): string {
     const target = ev.target as HTMLInputElement;
-    // check validity of elements
-    this.isValid = true;
-    for (let i = 0; i < this.formElement.children.length; i++) {
-        const element = this.formElement.children[i]
-        if ("reportValidity" in element) {
-        const valid = (element as HTMLInputElement).reportValidity();
-        this.isValid &&= valid;
-        }
-    }
+    this.isValid = target.reportValidity();
+    // for (let i = 0; i < this.formElement.children.length; i++) {
+    //     const element = this.formElement.children[i]
+    //     if ("reportValidity" in element) {
+    //       const valid = (element as HTMLInputElement).reportValidity();
+    //       this.isValid &&= valid;
+    //       if (!valid) {
+    //         console.debug("Element not valid: " + element.id);
+    //       }
+    //     }
+    // }
     return target.value
   }
 
   private handleDisease(ev: InputEvent) {
-    if(this.entry) {
+    if (this.entry) {
       const code = this.handleInputEvent(ev)
+      console.debug("Selected disease code changed to: " + code);
       const disease = this.diseases.find(d => d.code === code);
       this.entry.disease = Object.assign({}, disease);
+
+      console.debug("Current entry obj:", JSON.stringify(this.entry, null, 2));
     }
   }
 
   private async updateEntry() {
+    console.debug("Sending payload:", JSON.stringify(this.entry, null, 2));
+    
     try {
       const configuration = new Configuration({
         basePath: this.apiBase,
@@ -237,7 +238,7 @@ export class SsDiseaseCaseEditor {
       this.entry.patient.id = 'a-1';
 
       const waitingListApi = new DiseaseMonitorCasesApi(configuration);
-      
+
       const response = this.entryId == "@new" ?
         await waitingListApi.createDiseaseCaseListEntryRaw({regionId: this.regionId, diseaseCaseEntry: this.entry}) :
         await waitingListApi.updateDiseaseCaseEntryRaw({regionId: this.regionId, entryId: this.entryId, diseaseCaseEntry: this.entry});
