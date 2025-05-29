@@ -48,3 +48,35 @@ md-divider {
 .column-field {
   width: 100%;
 }
+
+.material-like-date-field {
+  display: flex;
+  flex-direction: column;
+  font-family: Roboto, sans-serif;
+  margin-bottom: 1rem;
+  width: 100%;
+  border-bottom: solid 1px black;
+  border-radius: 4px;
+  background-color: #e6e0e9;
+}
+
+.material-like-date-field label {
+  font-size: 0.75rem;
+  color: #5f6368;
+  padding: 0.5rem;
+}
+
+.material-like-date-field input[type="date"] {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: none;
+  box-shadow: inset 0 0 0 1px #dadce0;
+  transition: box-shadow 0.2s ease-in-out, background-color 0.2s;
+  background-color: #e6e0e9;
+}
+
+.material-like-date-field input[type="date"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #1a73e8;
+  background-color: #fff;
+}

@@ -1,5 +1,5 @@
 import { Component, Host, Prop, State, h, EventEmitter, Event } from '@stencil/core';
-import { DiseaseMonitorCasesApi, DiseaseCaseEntry, DiseaseTypesApi, Disease, Configuration } from '../../api/disease-monitor';
+import { DiseaseMonitorCasesApi, DiseaseCaseEntry, DiseaseTypesApi, Disease, Configuration, Patient } from '../../api/disease-monitor';
 
 @Component({
   tag: 'ss-disease-case-editor',
@@ -115,11 +115,9 @@ export class SsDiseaseCaseEditor {
         <form ref={el => this.formElement = el}>
           {this.renderDiseaseTypes()}
 
-          <md-filled-text-field label="Meno a priezvisko nakazeného" 
-            value={this.entry?.patient?.name} required
-            oninput={ (ev: InputEvent) => {
-              if (this.entry) {this.entry.patient.name = this.handleInputEvent(ev); }
-            }}>
+          <md-filled-text-field label="Meno a priezvisko nakazeného" required
+            value={this.entry?.patient?.name}
+            oninput={(ev: InputEvent) => this.handlePatientNameInputEvent(ev)}>
             <md-icon slot="leading-icon">person</md-icon>
           </md-filled-text-field>
           
@@ -140,18 +138,35 @@ export class SsDiseaseCaseEditor {
           </div>
     
           <div class="column-wrapper">
-            <md-filled-text-field class="column-field" label="Nakazený od" required 
-              value={new Date(this.entry?.diseaseStart || Date.now()).toLocaleDateString()}>
-              <md-icon slot="leading-icon">watch_later</md-icon>
-            </md-filled-text-field>
+            {/* Material Design does not support date pickers for web - using default HTML date picker */}
+            <div class="material-like-date-field">
+              <label>Dátum začiatku choroby</label>
+              <input type="date" id="diseaseStart"
+                      value={this.entry?.diseaseStart?.toISOString().substring(0, 10) ?? ''}
+                      onInput={(ev: Event) => {
+                        const target = ev.target as HTMLInputElement;
+                        if (this.entry) {
+                          this.entry.diseaseStart = new Date(target.value);
+                          console.debug(JSON.stringify(this.entry));
+                        }
+                      }} />
+            </div>
 
-            <md-filled-text-field class="column-field" label="Choroba prekonaná"
-              value={this.entry?.diseaseEnd?.toLocaleDateString() ?? ''}>
-              <md-icon slot="leading-icon">watch_later</md-icon>
-            </md-filled-text-field>
+            <div class="material-like-date-field">
+              <label>Dátum konca choroby</label>
+              <input type="date" id="diseaseEnd"
+                      value={this.entry?.diseaseEnd?.toISOString().substring(0, 10) ?? ''}
+                      onInput={(ev: Event) => {
+                        const target = ev.target as HTMLInputElement;
+                        if (this.entry) {
+                          this.entry.diseaseEnd = new Date(target.value);
+                        }
+                      }} />
+            </div>
           </div>
 
           <md-divider></md-divider>
+
           <div class="actions">
             <md-filled-tonal-button id="delete" disabled={ !this.entry || this.entry?.id === "@new"}
               onClick={() => this.deleteEntry()}>
@@ -164,7 +179,7 @@ export class SsDiseaseCaseEditor {
               Zrušiť
             </md-outlined-button>
             <md-filled-button id="confirm" disabled={ !this.isValid }
-              onClick={() => this.updateEntry() }>
+              onClick={(ev: InputEvent) => { ev.preventDefault(); this.updateEntry(); } }>
               <md-icon slot="icon">save</md-icon>
               Uložiť
             </md-filled-button>
@@ -184,7 +199,7 @@ export class SsDiseaseCaseEditor {
       }
     }
     return (
-      <md-filled-select id="chor" label="Choroba"
+      <md-filled-select id="chor" label="Choroba" required
         display-text={this.entry?.disease?.value}
         value={this.entry?.disease?.code}
         oninput={(ev: InputEvent) => this.handleDisease(ev)} >
@@ -202,18 +217,29 @@ export class SsDiseaseCaseEditor {
 
   private handleInputEvent( ev: InputEvent): string {
     const target = ev.target as HTMLInputElement;
-    this.isValid = target.reportValidity();
-    // for (let i = 0; i < this.formElement.children.length; i++) {
-    //     const element = this.formElement.children[i]
-    //     if ("reportValidity" in element) {
-    //       const valid = (element as HTMLInputElement).reportValidity();
-    //       this.isValid &&= valid;
-    //       if (!valid) {
-    //         console.debug("Element not valid: " + element.id);
-    //       }
-    //     }
-    // }
+    // check validity of elements
+    this.isValid = true;
+    for (let i = 0; i < this.formElement.children.length; i++) {
+        const element = this.formElement.children[i]
+        if ("reportValidity" in element) {
+        const valid = (element as HTMLInputElement).reportValidity();
+        this.isValid &&= valid;
+        }
+    }
     return target.value
+  }
+
+  private handlePatientNameInputEvent( ev: InputEvent) {
+    if (this.entry) {
+      const name = this.handleInputEvent(ev);
+      // Temporary hack to create patient object.
+      // TODO: select patients from a list instead of writing patient name (same as disease)
+      const patient: Patient = {
+        id: 'random-1',
+        name: name
+      }
+      this.entry.patient = Object.assign({}, patient);
+    }
   }
 
   private handleDisease(ev: InputEvent) {
@@ -222,20 +248,16 @@ export class SsDiseaseCaseEditor {
       console.debug("Selected disease code changed to: " + code);
       const disease = this.diseases.find(d => d.code === code);
       this.entry.disease = Object.assign({}, disease);
-
-      console.debug("Current entry obj:", JSON.stringify(this.entry, null, 2));
     }
   }
 
   private async updateEntry() {
     console.debug("Sending payload:", JSON.stringify(this.entry, null, 2));
-    
+
     try {
       const configuration = new Configuration({
         basePath: this.apiBase,
       });
-  
-      this.entry.patient.id = 'a-1';
 
       const waitingListApi = new DiseaseMonitorCasesApi(configuration);
 
