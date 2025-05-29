@@ -185,16 +185,9 @@ export class SsDiseaseMap {
   }
 
   render() {
-    if (this.errorMessage) {
-      return (
-        <Host>
-          <div class="error">{this.errorMessage}</div>
-        </Host>  
-      )
-    }
-
     return (
       <Host>
+        <div class="error">{this.errorMessage}</div>
         <div id="main">
           <div class="top-bar">Vizualizácia prípadov ochorenia - región {this.regionId}</div>
           <div id="content">
